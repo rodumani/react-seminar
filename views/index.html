@@ -43,7 +43,8 @@ var Chat = React.createClass({
       nickname: "USER" + Math.round(Math.random() * 10000),
       messages: [{
         from: "Jaeman An",
-        message: "Hello development team!"}]
+        message: "Hello development team!"}
+      ]
     }
   },
   render: function() {
@@ -68,7 +69,7 @@ var Chat = React.createClass({
           </ul>
         </div>
         <div className="footer form-group">
-          <MessageForm onSubmit={this.onSubmit} nickname={this.state.nickname} />
+          <MessageForm nickname={this.state.nickname} />
         </div>
       </div>
     );
@@ -78,7 +79,7 @@ var Chat = React.createClass({
 var MessageForm = React.createClass({
   render: function() {
     return (
-      <form onSubmit={this.onSubmit}>
+      <form>
         <div className="input-group">
           <span className="input-group-addon">{this.props.nickname}</span>
           <input className="form-control" type="text" />
