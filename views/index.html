@@ -37,109 +37,14 @@
     </style>
     <script type="text/babel">
 var Chat = React.createClass({
-  nextStart: 0,
+  secret: "",
   getInitialState: function() {
-    var userInfo = Cookies.get('react-tutorial-info');
-    this.nextStart = 0;
-    if (userInfo) {
-      userInfo = JSON.parse(userInfo);
-      return {
-        nickname: userInfo.nickname,
-        secret: userInfo.secret,
-        messages: []
-      }
-    } else {
-      return {
-        nickname: "USER" + Math.round(Math.random() * 10000),
-        secret: "",
-        messages: []
-      }
+    return {
+      nickname: "USER" + Math.round(Math.random() * 10000),
+      messages: [{
+        from: "Jaeman An",
+        message: "Hello development team!"}]
     }
-  },
-  componentDidMount: function() {
-    this.fetchMessage();
-    if (this.state.secret == "") {
-      this.login();
-    }
-  },
-  login: function() {
-    var nickname = window.prompt("닉네임을 정해주세요. 한번 정하면 바꿀 수 없어요.", this.state.nickname);
-    $.ajax({
-      url: "/login",
-      data: {
-        nickname: nickname
-      },
-      cache: false,
-      method: "POST",
-      dataType: "json",
-      success: function(data) {
-        this.setState({
-          nickname: nickname,
-          secret: data.secret
-        });
-        Cookies.set('react-tutorial-info', JSON.stringify({
-          nickname: nickname,
-          secret: data.secret
-        }));
-      }.bind(this),
-      error: function(xhr) {
-        this.login();
-      }.bind(this)
-    });
-  },
-  fetchMessage: function() {
-    setTimeout(() => {
-      $.ajax({
-        url: "/read",
-        method: "GET",
-        cache: false,
-        data: {
-          start: this.nextStart,
-        },
-        dataType: "json",
-        success: function(data) {
-          this.nextStart = data.nextStart;
-          var messages = this.state.messages.concat(data.messages).filter(function(message) {
-            return message.id;
-          });
-          this.setState({
-            messages: messages,
-          });
-          this.fetchMessage();
-        }.bind(this),
-        error: function(xhr) {
-          this.fetchMessage();
-        }.bind(this)
-      });
-    }, 500);
-  },
-  onSubmit: function(text) {
-    var newMessage = {
-      from: this.state.nickname,
-      message: text,
-      secret: this.state.secret
-    };
-
-    this.setState({
-      messages: this.state.messages.concat([newMessage])
-    });
-    this.refs.history.scrollTop = this.refs.history.scrollHeight;
-
-    $.ajax({
-      url: "/send",
-      method: "POST",
-      cache: false,
-      data: newMessage,
-      dataType: "json",
-      success: function(data) {
-      }.bind(this),
-      error: function(xhr) {
-        var res = xhr.responseJSON;
-        if (res.error == "secret is not correct") {
-          this.login();
-        }
-      }.bind(this)
-    });
   },
   render: function() {
     var messagesView = this.state.messages.map(function(message, idx) {
@@ -171,24 +76,12 @@ var Chat = React.createClass({
 });
 
 var MessageForm = React.createClass({
-  getInitialState: function() {
-    return {message: ""};
-  },
-  onChange: function(e) {
-    this.setState({message: e.target.value});
-  },
-  onSubmit: function(e) {
-    e.preventDefault();
-    var input = this.refs.messageInput;
-    this.setState({message: ""});
-    this.props.onSubmit(input.value);
-  },
   render: function() {
     return (
       <form onSubmit={this.onSubmit}>
         <div className="input-group">
-          <span className="input-group-addon" id="sizing-addon1">{this.props.nickname}</span>
-          <input className="form-control" type="text" onChange={this.onChange} value={this.state.message} ref="messageInput"/>
+          <span className="input-group-addon">{this.props.nickname}</span>
+          <input className="form-control" type="text" />
           <span className="input-group-btn">
             <button className="btn btn-primary form-control" type="submit">Send</button>
           </span>
