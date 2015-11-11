@@ -31,7 +31,7 @@ var dao = {
         var key = keys['messages'];
         client.incr('counter', function (err, val) {
             if (err) { throw err; }
-            mssage['id'] = val;
+            message['id'] = val;
             var strMessage = JSON.stringify(message);
             client.lpush(key, strMessage, redis.print);
             after();
